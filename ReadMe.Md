@@ -1,3 +1,42 @@
+# Table Of Contents
+1. OSI & TCP/IP Implementation of Networking Protocols
+
+2. IP Header | IP addressing techniques | IPV4 & IPV6
+
+3. Transport Layer | TCP, UDP, TLS, IPSEC, Tunneling, Encapsulation, VPNs
+
+4. Application layer -> HTTPS, SSH, Telnet, Rsync, DNS, DHCP
+
+5. Cabling Standards (Ethernet && Fibre) & Network Devices Categorization
+
+6. Voice and Video Protocols
+
+7. Switching | Switching protocols, vtp, dtp, stp, pvst, rapid pvst, etherchannel, PAgp and lacp
+
+8. Routing | Routing Protocols, rip, eigrp, ospf, bgp, Routing COnfigurations, Access Control
+
+9. Management Plane/Layer/Protocols - CDP, LLDP, NAT, SNMP, SYSLOG, NTP, FTP, TFTP
+
+10. Control Plane/Layer/Protocols - QOS
+
+11. Network Security - Port Security, Dhcp Snooping, DAI
+
+12. Network Architecture, Design, Topology
+
+13. Networking Tools of Trade
+
+14. Network Troubleshooting Methodology - Ethernet/Fibre/Wireless Issues
+
+15. Wireless Standard, Wireless security & deployment
+
+16. Network Topology
+
+17. Software defined networking
+
+18. Infrastructure as COde- AUtomation & Orchestration 
+
+---
+
 ## Networking Protocols
 A NETWORK is two or more computers or devices that are linked in order to share information.
 Networks are broken into different subsets based on their size and function.
