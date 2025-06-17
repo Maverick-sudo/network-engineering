@@ -1,7 +1,9 @@
-# Table Of Contents
-1. OSI & TCP/IP Implementation of Networking Protocols
+# Network Engineering Notes Table of Contents
+1. Chapter 1: OSI & TCP/IP Implementation of Networking Protocols
 
-2. IP Header | IP addressing techniques | IPV4 & IPV6
+2. Chapter 2: TCP/IP Network Model and Implementation 
+
+3. Chapter 3: Internet Protocol addressing techniques (IPV4 & IPV6) 
 
 3. Transport Layer | TCP, UDP, TLS, IPSEC, Tunneling, Encapsulation, VPNs
 
@@ -35,42 +37,39 @@
 
 18. Infrastructure as COde- AUtomation & Orchestration 
 
+19. 
+
+20. 
+
 ---
 
-## Networking Protocols
-A NETWORK is two or more computers or devices that are linked in order to share information.
-Networks are broken into different subsets based on their size and function.
-❗️Local Area network
-❗️Campus Area network 
-❗️Wide Area network(the whole Internet can technically be classified as a WAN!)
 
-An application layer is an abstraction layer that specifies the shared communications protocols and interface methods used by hosts in a communications network. The application layer abstraction is used in both of the standard models of computer networking: the Internet Protocol Suite (TCP/IP) and the OSI model. Although both models use the same term for their respective highest-level layer, the detailed definitions and purposes are different. What are network protocols? They are simply a set of standards for devices interacting on the Internet…
+## Chapter 1: Open Systems Interconnection: Network Model and Implementation
 
-This response for this initial request contains the first byte of data received. Time to First Byte (TTFB) is the time between when the user made the request — say by clicking on a link — and the receipt of this first packet of HTML. The first chunk of content is usually 14KB of data.
-
-## Open Systems Interconnection: Network Model and Implementation
-The OSI (Open Systems Interconnection) model provides a conceptual framework for understanding network functions.
+A NETWORK is two or more computers or devices that are linked in order to share information. Networks are broken into different subsets based on their size and function. The OSI (Open Systems Interconnection) model provides a conceptual framework for understanding network functions.
 The OSI Model was developed in the 1970s and 1980s, and it is a conceptual model that breaks networking into seven separate layers. Each layer refers to a set of functions that are responsible for specific tasks. In the OSI model, the definition of the application layer is narrower in scope. The OSI model defines the application layer as only the interface responsible for communicating with host-based and user-facing applications. OSI then explicitly distinguishes the functionality of two additional layers, the session layer and presentation layer, as separate levels below the application layer and above the transport layer. OSI specifies a strict modular separation of functionality at these layers and provides protocol implementations for each. In contrast, the Internet Protocol Suite compiles these functions into a single layer.
 ￼
 The processes of encapsulation and de-encapsulation work in exactly the same way with the TCP/IP model as they do with the OSI model. At each layer of the this models a header is added during Data_encapsulation, and removed during Data_de-encapsulation.
+
+![alt text](osi.jpeg)
 
 ### Layer 1: Physical Layer (Cabling involving Data Bits/Streams))
 
 The Physical, and lowest layer of the model, covers how unstructured data, like bits, is transmitted. Over these wires and signals, the raw data bits are received as a stream of 0s and 1s. Fixing errors that occur just at this layer means considering physical damage or interference. Some concrete examples of this are the ways wires are configured, the way signals are transferred over those wires, and the radio frequencies computers use. Technology such as WiFi, Bluetooth, and cable standards such as CAT5 and CAT6 all operate at this layer. This layer also includes the hardware part of modems, adapters, and repeaters.
 
-* **Function:** Deals with the physical transmission of raw bit streams over a physical medium. It defines hardware specifications, cabling standards, connectors, voltage levels, and data rates.
-* **Components:**
-    * **Cabling:** Ethernet cables (twisted pair - Cat5e, Cat6, Cat6a; fiber optic cables - single-mode, multi-mode), wireless signals (radio waves, infrared).
-    * **Connectors:** RJ-45 for Ethernet, LC/SC for fiber.
-    * **Physical Devices:** Hubs (obsolete, act as multi-port repeaters), repeaters, modems, Network Interface Cards (NICs) at the physical level.
-* **Performance Impact:**
-    * **Cable Type:** Affects bandwidth, distance, and interference resistance (e.g., fiber offers higher bandwidth and longer distances than copper).
-    * **Cable Length:** Exceeding maximum lengths causes signal degradation.
-    * **Interference:** Electromagnetic interference (EMI) or radio frequency interference (RFI) can degrade signal quality.
-    * **Hubs (Historical):** Lead to severe performance degradation due to collision domains encompassing all connected devices and shared bandwidth.
+* **Function:** Defines the means of transmitting raw bits over a physical data link connecting network nodes. It deals with hardware, cabling, and communication specifications.
+* **Key Aspects:**
+    * Translates bits into physical signals (electrical, light, radio).
+    * Specifies electrical signals, physical connections, cabling types, and pin-outs.
+    * Governs hardware specifications (e.g., RJ-45, fiber optic connectors, radio frequencies).
+    * **Media Types:** Cat-5, Cat-6, Fiber Optic, Radio Waves, Infrared, Copper.
+    * **Units:** Bits.
+    * **Protocols/Standards:** Ethernet Physical Layer, USB, DSL, ISDN, Bluetooth.
+* **Devices:** Hubs (obsolete), repeaters, network interface cards (NICs), modems, transceivers.
 
 ### Layer 2: Data Link Layer (Switching involving Data Frames)
 The Data Link layer covers how data is sent from device to device when they are connected on the same local network. 
+
 * **Function:** Provides reliable data transfer between adjacent network nodes. It handles physical addressing (MAC addresses), error detection (and sometimes correction), and defines how devices access the physical medium (e.g., CSMA/CD for Ethernet, CSMA/CA for Wi-Fi). It creates **frames**.
 * **Components:**
     * **Switches:** Modern Layer 2 devices that forward frames based on MAC addresses. They create **separate collision domains** for each port, improving performance significantly over hubs.
@@ -96,25 +95,72 @@ The Network layer describes how data packets are routed between wider networks s
     * **Subnetting/IP Addressing Scheme:** A well-designed IP addressing scheme simplifies routing and improves network efficiency.
     * **ACLs/Firewall Rules:** Can add processing overhead, impacting throughput if too complex or numerous.
 
+
+### Layer 4: Transport Layer (Involves Data Segments-TCP, Datagrams-UDP)
+Layers 1 through 3 of the OSI Model are concerned with addressing, packet forwarding, and delivery, establishing basic connectivity. Layer 4, the **Transport Layer**, focuses on providing the transport services that network applications depend upon. 
+The Transport layer refers to how data is actually transferred. The transport layer handles how the data(files, media, etc) from user/client are split (segmentation), the rate at which the packets are sent, and how errors are handled if data packets don’t make it to the site’s server. The most common transport protocols on the Internet are TCP (Transmission Control Protocol) and UDP (User Datagram Protocol). 
+* **Function:** Deals with the transparent transfer of data between end users, providing reliable data transfer services to the upper layers. It handles segmenting data from the session layer and reassembling it into a data stream on the receiving end.
+* **Key Aspects:**
+    * **Reliability:** Manages connection-oriented communication (e.g., TCP) or connectionless (e.g., UDP).
+    * **Flow Control:** Manages data transmission rates to prevent faster senders from overwhelming slower receivers.
+    * **Congestion Control:** Manages network traffic to avoid overloading the network.
+    * **Segmentation & Reassembly:** Breaks data from the session layer into segments (TCP) or datagrams (UDP) and reassembles them at the destination.
+    * **Error Correction:** Detects and handles errors in data transmission (primarily TCP).
+    * **Port Numbers:** Uses port numbers to identify specific applications or services.
+* **Units:** Segments (TCP) or Datagrams (UDP).
+* **Protocols:** TCP (Transmission Control Protocol), UDP (User Datagram Protocol), SCTP (Stream Control Transmission Protocol), DCCP (Datagram Congestion Control Protocol).
+
+### Layer 5: Session Layer
+When two computers or devices have established connection / started an exchange of information, we call that a session. The Session layer in OSI is responsible for opening, closing, and maintaining sessions. In terms of opening and closing, the session layer includes authentication and authorization measures. For example, without logging in or having the right permissions, you may not be able to connect to parts of a website. But if you are logged in, your access permission is stored for a set amount of time, or session length.
+* **Function:** Establishes, manages, and terminates the connections (sessions) between applications. It enables the applications to send and receive data in an organized manner.
+* **Key Aspects:**
+    * **Dialogue Control:** Manages turn-taking in communication (who sends, when, for how long).
+    * **Synchronization:** Inserts checkpoints into the data stream (e.g., for large file transfers) to allow recovery from network failures.
+    * **Session Management:** Creates, maintains, and tears down sessions between processes.
+* **Units:** Data (as organized into sessions).
+* **Protocols/APIs:** NetBIOS, RPC (Remote Procedure Call), Sockets API, SQL.
+
+### Layer 6: Presentation Layer
+The Presentation layer includes all the methods that convert data into a format usable by an application⬇️. This layer handles functions such as encoding/decoding, encryption/decryption, and compression/decompression of files.
+* **Function:** Ensures that data is presented in a format that the application layer can understand. It handles data format, encryption/decryption, and compression/decompression.
+* **Key Aspects:**
+    * **Data Formatting/Translation:** Translates data into a standard format (e.g., ASCII, EBCDIC).
+    * **Encryption/Decryption:** Handles the encryption and decryption of data for secure communication.
+    * **Compression/Decompression:** Compresses data for efficient transmission and decompresses it upon reception.
+* **Units:** Data (in formatted/translated state).
+* **Protocols/Standards:** JPEG, GIF, MPEG, ASCII, EBCDIC, SSL/TLS (though often seen spanning Presentation and Session, sometimes Transport).
+
+### Layer 7: Application Layer
+The application layer of the OSI model essentially provides networking options to programs running on a computer. It works almost exclusively with applications, providing an interface for them to use in order to transmit data. The final layer of the OSI model is the Application layer. This layer includes websites, browsers, email, mobile applications, and how they render Internet data so that we can interact with it.
+* **Function:** Provides network services directly to end-user applications. It is the layer closest to the end user and enables users to interact with network services.
+* **Key Aspects:**
+    * Interacts with software applications that implement a communicating component.
+    * Defines protocols for end-user services.
+    * Provides user interfaces for network services.
+* **Units:** Data (in application-specific format).
+* **Protocols:** HTTP, FTP, SMTP, DNS, SSH, Telnet, DHCP, POP3, IMAP, SNMP.
+
 ---
 
-### Layer 4 – Transport Layer (Involves Data Segments-TCP, Datagrams-UDP)
-The Transport layer refers to how data is actually transferred. The transport layer handles how the data(files, media, etc) from user/client are split (segmentation), the rate at which the packets are sent, and how errors are handled if data packets don’t make it to the site’s server. The most common transport protocols on the Internet are TCP (Transmission Control Protocol) and UDP (User Datagram Protocol). 
-
-### Layer 5 – Session 
-When two computers or devices have established connection / started an exchange of information, we call that a session. The Session layer in OSI is responsible for opening, closing, and maintaining sessions. In terms of opening and closing, the session layer includes authentication and authorization measures. For example, without logging in or having the right permissions, you may not be able to connect to parts of a website. But if you are logged in, your access permission is stored for a set amount of time, or session length.
-
-### Layer 6 – Presentation
-The Presentation layer includes all the methods that convert data into a format usable by an application⬇️. This layer handles functions such as encoding/decoding, encryption/decryption, and compression/decompression of files.
-
-### Layer 7 – Application
-The application layer of the OSI model essentially provides networking options to programs running on a computer. It works almost exclusively with applications, providing an interface for them to use in order to transmit data. The final layer of the OSI model is the Application layer. This layer includes websites, browsers, email, mobile applications, and how they render Internet data so that we can interact with it.
-
-## TCP/IP Network Model and Implementation
+## Chapter 2: TCP/IP Network Model and Implementation 
 In the Internet protocol suite, the application layer contains the communications protocols and interface methods used in process-to-process communications across an Internet Protocol (IP) computer network. The application layer only standardizes communication and depends upon the underlying transport layer protocols to establish host-to-host data transfer channels and manage the data exchange in a client–server or peer-to-peer networking model. Though the TCP/IP application layer does not describe specific rules or data formats that applications must consider when communicating, the original specification (in RFC 1123) does rely on and recommend the robustness principle for application design.
 You will hear more often about the TCP/IP model, which is a 4-Abstraction layered model that makes direct reference to current Internet implementations. Its foundational protocols are TCP and IP.
 
-## Network Interface layer / LINK LAYER➡️(Physical Layer 1 + Data Link 2) https://en.wikipedia.org/wiki/Link_layer
+### OSI vs. TCP/IP Model Comparison
+
+| Feature           | OSI Model                                    | TCP/IP Model                                   |
+| :---------------- | :------------------------------------------- | :--------------------------------------------- |
+| **Layers** | 7 Layers                                     | 4 or 5 Layers (Network Access, Internet, Transport, Application) |
+| **Purpose** | Conceptual framework, standardized design    | Practical, industry-standard, widely implemented |
+| **Development** | Developed by ISO                              | Developed by ARPA (DOD)                         |
+| **Reliability** | Connection-oriented (Transport), Connection-less (Network) can be implemented | Both connection-oriented (TCP) and connectionless (UDP) options |
+| **Protocols** | Protocol independent                         | Protocols are built into the model              |
+| **Focus** | Clear separation of services, interfaces, protocols | Less strict separation, more flexible           |
+| **Relevance** | Primary reference model for understanding networking | Practical model for Internet communication      |
+| **Interoperability**| More rigid due to strict layering             | More adaptable, easier for cross-platform communication |
+| **Security** | Security considerations at all layers (conceptual) | Security often implemented at specific layers (e.g., IPSec at Network) |
+
+### Network Interface layer / LINK LAYER https://en.wikipedia.org/wiki/Link_layer
 This layer emcompasses group of methods and communications protocols confined to the link that a host is physically connected to i.e the physical interface between the host system and the network hardware. It defines how data packets are to be formatted for transmission and routings. The link is the physical and logical network component used to interconnect hosts or nodes in the network and a link protocol is a suite of methods and standards that operate only between adjacent network nodes of a network segment. The link layer includes the protocols that define communication between local (on-link) network nodes which fulfill the purpose of maintaining link states between the local nodes, such as the local network topology, and that usually use protocols that are based on the framing of packets specific to the link types.  
 The goal of this layer is to provide reliable communications between hosts connected on a network. Some of the services provided by this layer of the network stack include.
 Data Framing - Breaking up the data stream into individual frames in packets. Data frames are groups of data bits at the Link layer that need to be routed to the correct physical location.
@@ -132,9 +178,7 @@ Wireless Networks
 ✔️ Hidden Node Attack
 ✔️ De-auth(De-authentication) Attack
 
-
-
-## INTERNET LAYER➡️Also referred to as NETWORK LAYER (OSI Model) https://en.wikipedia.org/wiki/Internet_layer
+### INTERNET LAYER https://en.wikipedia.org/wiki/Internet_layer
 Is a Layer of group of Internetworking methods(concepts of connecting multiple networks with each other via gateways), protocols & specifications that are used to transport network packets(IP-based packets) from the ordination host across network boundaries, If necessary to the destination host specified by an Internet protocol address put simply, This is where IP Logical Addressing system and Routing occur. A common design aspect in the internet layer is the robustness principle: "Be liberal in what you accept, and conservative in what you send"
 
 In its operation as a connectionless protocol, the internet layer is not responsible for reliable transmission. It provides only an unreliable service, and best effort delivery. This means that the network makes no guarantees about the proper arrival of packets. This in accordance with the *end-to-end principle*. Since packet delivery across diverse networks is an inherently unreliable and failure-prone operation, the burden of providing reliability was placed with the end points of a communication path, i.e., the hosts, rather than on the network. This is one of the reasons of the resiliency of the Internet against individual link failures and its proven scalability. The aspect of data integrity function of providing reliability of service is the duty of higher level protocols, such as the (TCP) in the transport layer. 
@@ -146,20 +190,65 @@ For incoming packets, capture packets and pass the packet payload up to the appr
 Provide Error Detection & Diagnostic Capability. Usually through Internet Control Message Protocol(ICMP) & Internet Group Management Protocol(IGMP)
 
 
-### IP Addressing Techniques: IPv4 and IPv6
+### TRANSPORT LAYER https://en.wikipedia.org/wiki/Transport_layer
+The transport layer is responsible for delivering data to the appropriate application process on the host computers. The services in this layer are conveyed to an Application Programming Interface through the transport layer protocols, Their services may include the following features.
+✔️Connection-Oriented Communication
+✔️Same Order Delivery
+✔️Reliability through error-detection code I.e Checksum, SYN/ACK
+✔️Flow Control Management
+✔️Traffic Congestion Avoidance 
+✔️Multiplexing==>Ports providing multiple endpoints on single node.
+*Transport Layer Protocols includes also
+UDP-lite https://en.wikipedia.org/wiki/UDP-Lite
+Reliable UDP(RUDP) https://en.wikipedia.org/wiki/Reliable_User_Datagram_Protocol
+Multipath TCP https://en.wikipedia.org/wiki/Multipath_TCP
+Stream Control Transmission Protocol(SCTP) https://en.wikipedia.org/wiki/Stream_Control_Transmission_Protocol 
+Datagram Congestion Control Protocol(DCCP) https://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol
 
-*IPV6 Vs IPV4*
-IPv6 provides other technical benefits in addition to a larger addressing space. In particular, it permits hierarchical address allocation methods that facilitate route aggregation across the Internet, and thus limit the expansion of routing tables. The use of multicast addressing is expanded and simplified, and provides additional optimization for the delivery of services. Device mobility, security, and configuration aspects have been considered in the design of the protocol. 
-It simplifies aspects of address configuration, network renumbering, and router announcements when changing network connectivity providers. It simplifies processing of packets in routers by placing the responsibility for packet fragmentation into the end points. The IPv6 subnet size is standardized by fixing the size of the host identifier portion of an address to 64 bits.
+At this layer, the TCP/IP protocol suite defines how different applications on separate hosts establish connections and track communications.
+Understanding how protocols use ports to establish connections is critical for configuring and supporting network services. Protocols at the Transport layer are concerned with the delivery of **multiplexed application data**.
 
-The addressing architecture of IPv6 allows three different types of transmission: unicast, anycast and multicast. IPv6 is not foreseen to supplant IPv4 instantaneously. Both protocols will continue to operate simultaneously for some time. Therefore, IPv6 transition mechanisms are needed to enable IPv6 hosts to reach IPv4 services and to allow isolated IPv6 hosts and networks to reach each other over IPv4 infrastructure.
- 
-On the Internet, data is transmitted in the form of network packets. IPv6 specifies a new packet format, designed to minimize packet header processing by routers. Because the headers of IPv4 packets and IPv6 packets are significantly different, the two protocols are not interoperable. IPv6 does not implement traditional IP broadcast, i.e. the transmission of a packet to all hosts on the attached link using a special broadcast address, and therefore does not define broadcast addresses. The results are achieved using multicasting,  because it does not support the broadcast addressing method, on which the functionality of the Address Resolution Protocol (ARP) in IPv4 is based. IPv6 implements the Neighbor Discovery Protocol (NDP) in the link layer, which relies on ICMPv6 and multicast transmission
+A TCP/IP host may be running multiple services/applications or communicating in parallel with multiple servers, clients, and peers. This means that incoming packets must be directed to the appropriate service or application. To facilitate this, each TCP/IP application type is assigned a unique identifier called a **Port Number**.
+
+* **0-1023:** **Well-known ports** (assigned by IANA to common services like HTTP, FTP, SSH).
+* **1024-49151:** **Registered ports** (can be registered for specific applications but are not "well-known").
+* **49152-65535:** **Dynamic/Private/Ephemeral ports** (client applications assign their own temporary port numbers to track their requests; often called **Source Ports**).
+
+A **Socket** is a software process that identifies a specific endpoint for communication. A connection is formed when a client requests a service from a server using a combination of IP address and port number.
+
+* **Client Socket:** `Client IP:Client PORT` (e.g., `192.168.1.10:51234`)
+* **Server Socket:** `Server IP:Server PORT` (e.g., `192.168.1.1:80`)
+
+A server socket can support multiple connections from a number of client sockets, and a client may open multiple connections to the same server port. Each combination of Source Socket and Destination Socket forms a separate connection, listed in the host's **State Table**. Server replies are directed to the ephemeral (client) port that opened the connection, allowing data to be received by the correct application on the client.
 
 
-Both IPv4 and IPv6 addresses are ultimately represented in binary, although you'll commonly see them in decimal (IPv4) or hexadecimal (IPv6) format for convenience. Each segment (octet in IPv4, hextet in IPv6) ultimately represents 8 bits of binary.
+### APPLICATION LAYER https://en.wikipedia.org/wiki/Category:Application_layer_protocols
+This includes the opening and closing of sessions, translating data, and the interaction with content at the application level. Here, there are multiple protocols for web content, email, and accessing files, including HTTP, FTP, SMTP, and more. 
 
-#### IPv4 Header
+
+
+
+## Chapter 3: Internet Protocol addressing techniques (IPV4 & IPV6) 
+
+### IP Header
+![alt text](IPv6_header-en.svg.png)
+
+* **Function:** Contains important information for routing and delivering IP packets.
+* **Key Fields:**
+    * **Version:** Identifies the IP protocol version (IPv4 or IPv6).
+    * **Header Length:** Specifies the length of the IP header (in 32-bit words).
+    * **Type of Service (ToS) / Differentiated Services Code Point (DSCP):** Used for Quality of Service (QoS), prioritizing certain types of traffic.
+    * **Total Length:** The total length of the IP packet, including header and data.
+    * **Identification, Flags, Fragment Offset:** Used for IP fragmentation and reassembly.
+    * **Time To Live (TTL):** Prevents packets from looping infinitely; decremented at each router hop. When it reaches 0, the packet is discarded.
+    * **Protocol:** Indicates the next-level protocol (e.g., TCP, UDP, ICMP).
+    * **Header Checksum:** Used for error detection in the header.
+    * **Source IP Address:** The IP address of the sender.
+    * **Destination IP Address:** The IP address of the intended recipient.
+    * **Options (Optional):** Rarely used, provides additional functionality.
+
+
+
 The **Protocol field** within the IP header indicates the higher-layer protocol encapsulated within the IP packet.
 * **TCP (6)** or **UDP (17)** are common transport layer protocols.
 * Some protocols are used **directly on IP** (rather than relying on transport layers) for specific functions, such as:
@@ -1007,45 +1096,21 @@ Subnet Mask: 255.255.255.0
 Wildcard Mask: 255 - 255.255 - 255.255 - 255.255 - 0 = 0.0.0.255
 
 
-## TRANSPORT LAYER➡️ https://en.wikipedia.org/wiki/Transport_layer
-The transport layer is responsible for delivering data to the appropriate application process on the host computers. The services in this layer are conveyed to an Application Programming Interface through the transport layer protocols, Their services may include the following features.
-✔️Connection-Oriented Communication
-✔️Same Order Delivery
-✔️Reliability through error-detection code I.e Checksum, SYN/ACK
-✔️Flow Control Management
-✔️Traffic Congestion Avoidance 
-✔️Multiplexing==>Ports providing multiple endpoints on single node.
-*Transport Layer Protocols includes also
-UDP-lite https://en.wikipedia.org/wiki/UDP-Lite
-Reliable UDP(RUDP) https://en.wikipedia.org/wiki/Reliable_User_Datagram_Protocol
-Multipath TCP https://en.wikipedia.org/wiki/Multipath_TCP
-Stream Control Transmission Protocol(SCTP) https://en.wikipedia.org/wiki/Stream_Control_Transmission_Protocol 
-Datagram Congestion Control Protocol(DCCP) https://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol
 
-### Layer 4: The Transport Layer
+### IPV6 Vs IPV4
 
-Layers 1 through 3 of the OSI Model are concerned with addressing, packet forwarding, and delivery, establishing basic connectivity. Layer 4, the **Transport Layer**, focuses on providing the transport services that network applications depend upon. At this layer, the TCP/IP protocol suite defines how different applications on separate hosts establish connections and track communications.
+IPv6 provides other technical benefits in addition to a larger addressing space. In particular, it permits hierarchical address allocation methods that facilitate route aggregation across the Internet, and thus limit the expansion of routing tables. The use of multicast addressing is expanded and simplified, and provides additional optimization for the delivery of services. Device mobility, security, and configuration aspects have been considered in the design of the protocol. 
+It simplifies aspects of address configuration, network renumbering, and router announcements when changing network connectivity providers. It simplifies processing of packets in routers by placing the responsibility for packet fragmentation into the end points. The IPv6 subnet size is standardized by fixing the size of the host identifier portion of an address to 64 bits.
 
-Understanding how protocols use ports to establish connections is critical for configuring and supporting network services. Protocols at the Transport layer are concerned with the delivery of **multiplexed application data**.
+The addressing architecture of IPv6 allows three different types of transmission: unicast, anycast and multicast. IPv6 is not foreseen to supplant IPv4 instantaneously. Both protocols will continue to operate simultaneously for some time. Therefore, IPv6 transition mechanisms are needed to enable IPv6 hosts to reach IPv4 services and to allow isolated IPv6 hosts and networks to reach each other over IPv4 infrastructure.
+ 
+On the Internet, data is transmitted in the form of network packets. IPv6 specifies a new packet format, designed to minimize packet header processing by routers. Because the headers of IPv4 packets and IPv6 packets are significantly different, the two protocols are not interoperable. IPv6 does not implement traditional IP broadcast, i.e. the transmission of a packet to all hosts on the attached link using a special broadcast address, and therefore does not define broadcast addresses. The results are achieved using multicasting,  because it does not support the broadcast addressing method, on which the functionality of the Address Resolution Protocol (ARP) in IPv4 is based. IPv6 implements the Neighbor Discovery Protocol (NDP) in the link layer, which relies on ICMPv6 and multicast transmission
 
-A TCP/IP host may be running multiple services/applications or communicating in parallel with multiple servers, clients, and peers. This means that incoming packets must be directed to the appropriate service or application. To facilitate this, each TCP/IP application type is assigned a unique identifier called a **Port Number**.
+Both IPv4 and IPv6 addresses are ultimately represented in binary, although you'll commonly see them in decimal (IPv4) or hexadecimal (IPv6) format for convenience. Each segment (octet in IPv4, hextet in IPv6) ultimately represents 8 bits of binary.
 
-* **0-1023:** **Well-known ports** (assigned by IANA to common services like HTTP, FTP, SSH).
-* **1024-49151:** **Registered ports** (can be registered for specific applications but are not "well-known").
-* **49152-65535:** **Dynamic/Private/Ephemeral ports** (client applications assign their own temporary port numbers to track their requests; often called **Source Ports**).
 
-### Sockets
 
-A **Socket** is a software process that identifies a specific endpoint for communication. A connection is formed when a client requests a service from a server using a combination of IP address and port number.
-
-* **Client Socket:** `Client IP:Client PORT` (e.g., `192.168.1.10:51234`)
-* **Server Socket:** `Server IP:Server PORT` (e.g., `192.168.1.1:80`)
-
-A server socket can support multiple connections from a number of client sockets, and a client may open multiple connections to the same server port. Each combination of Source Socket and Destination Socket forms a separate connection, listed in the host's **State Table**. Server replies are directed to the ephemeral (client) port that opened the connection, allowing data to be received by the correct application on the client.
-
----
-
-### Transmission Control Protocol (TCP)
+## Transmission Control Protocol (TCP)
 
 The Transmission Control Protocol provides a communication service at an intermediate level between an Application program & the Internet Protocol. It provides host-to-host connectivity at the transport layer of the Internet model. At the transport layer, TCP handles all handshaking and transmission details and presents an abstraction of the network connection to the application typically through a network socket interface.
 
@@ -1387,13 +1452,6 @@ Networks are usually "unreliable", meaning they offer no guarantees that they wi
 *Stop-and-wait ARQ
 *Go-Back-N ARQ
 *Selective Repeat ARQ
-
-
-
----
-
-## APPLICATION LAYER➡️ https://en.wikipedia.org/wiki/Category:Application_layer_protocols
-This includes the opening and closing of sessions, translating data, and the interaction with content at the application level. Here, there are multiple protocols for web content, email, and accessing files, including HTTP, FTP, SMTP, and more. 
 
 
 ## Domain Name System (DNS)
