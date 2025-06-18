@@ -40,7 +40,6 @@
 20. CHAPTER 20: INFRASTRUCTURE AS CODE (IAC): AUTOMATION & ORCHESTRATION
 ---
 
-
 # CHAPTER 1: OSI & TCP/IP IMPLEMENTATION OF NETWORKING PROTOCOLS
 
 A NETWORK is two or more computers or devices that are linked in order to share information. Networks are broken into different subsets based on their size and function. The OSI (Open Systems Interconnection) model provides a conceptual framework for understanding network functions.
@@ -48,7 +47,7 @@ The OSI Model was developed in the 1970s and 1980s, and it is a conceptual model
 ￼
 The processes of encapsulation and de-encapsulation work in exactly the same way with the TCP/IP model as they do with the OSI model. At each layer of the this models a header is added during Data_encapsulation, and removed during Data_de-encapsulation.
 
-![alt text](img/osi.jpeg) (Image Placeholder - OSI Model)
+![OSI Model](images/OSI.jpeg)
 
 ### Layer 1: Physical Layer (Cabling involving Data Bits/Streams))
 
@@ -231,7 +230,7 @@ This includes the opening and closing of sessions, translating data, and the int
 
 ### Internet Protocols Packet Structure: IPv4 Header
 
-![alt text](img/ipv4header) (Image Placeholder - IPv4)
+![IPv4](images/IP-Header-v4.png)
 
 * **Function:** Contains important information for routing and delivering IP packets.
 * **Key Fields:**
@@ -529,7 +528,7 @@ The ICMPv6 protocol must limit the number of error messages sent to the same des
 	•	Source Routing
 IPv6 routers do not perform IP fragmentation. IPv6 hosts are required to do one of the following: perform Path MTU Discovery, perform end-to-end fragmentation, or send packets no larger than the default maximum transmission unit (MTU), which is 1280 octets.
 
-![alt text](img/ipv6header) (Image Placeholder - Ipv6)
+![Ipv6](images/IP-Header-v6.png)
 
 IPv6 is the most recent version of the Internet Protocol, designed to replace IPv4 due to the exhaustion of IPv4 addresses. It uses 128-bit addresses, providing a significantly larger address space than IPv4's 32-bit addresses. This expansion allows for connecting a vast number of devices to the internet, including the increasing number of Internet of Things (IoT) devices. 
 
@@ -1024,7 +1023,7 @@ TCP is used extensively by many internet applications, including the World Wide 
 	Broadcasts – being connectionless, UDP can broadcast - sent packets can be addressed to be receivable by all devices on the subnet.
 	Multicast – a multicast mode of operation is supported whereby a single datagram packet can be automatically routed without duplication to a group of subscribers.
 
-(Image Placeholder - TCP Segment format)
+![TCP](images/TCP-Header.png)
 
 #### TCP Segment Structure and Header Fields
 
@@ -1056,7 +1055,6 @@ A TCP connection is established using a **Three-Way Handshake**:
 
 A host can end a session gracefully using a **Four-Way Handshake** (involving FIN and ACK flags from both sides). A host can also end a session abruptly using an **RST (Reset)** flag, typically indicating an error, failure, or suspicious activity. The server expects regular acknowledgments for segments it sends. If a timeout occurs without an acknowledgment, it means the information didn't arrive, and the server automatically resends that segment. This overhead makes TCP suitable when reliability and integrity are paramount, even if it results in slightly slower transmission.
 
-(Image Placeholder - TCP 3-Way Handshake)
 
 ### User Datagram Protocol (UDP)
 
@@ -1079,7 +1077,7 @@ Unlike TCP, **UDP** is a **Connectionless, Non-Reliable** method of communicatio
 * **Multicast** and **Broadcast** traffic are supported by UDP.
 * It is typically used for applications that transport time-sensitive data but do not require complete reliability (e.g., video or voice streaming). Using smaller packets for transmission means that if a few are lost or arrive out of order, they manifest as minor glitches in playback quality. The reduced overhead means that overall delivery is faster.
 
-(Image Placeholder - UDP Datagram Format)
+![UDP](images/UDP-Header.png)
 
 #### UDP Datagram Structure
 
@@ -1126,7 +1124,7 @@ Clients request that a server sets up a TLS connection, achieved either by:
 * Using HTTP port **443** (for encrypted HTTPS traffic).
 * Protocol-specific negotiation (e.g., `STARTTLS` command) to switch a connection from unencrypted (e.g., port 80 for HTTP) to encrypted.
 
-(Image Placeholder - TLS Handshake Diagram)
+![TLS](images/TLS-handshake-protocol.png)
 
 The TLS Handshake is a complex process but can be summarized:
 
@@ -1172,13 +1170,17 @@ In computer networks, a tunneling protocol is a communication protocol which all
     * **Function:** Encrypts or authenticates only the IP payload (the data portion of the packet). The original IP header remains intact.
     * **Use Case:** Primarily used for host-to-host or end-to-end communication, typically when traffic is already originating or terminating on the IPsec peer (e.g., a client securely communicating with a server).
     * **Header:** Adds IPsec headers (AH or ESP) between the original IP header and the transport layer header.
-(Image Placeholder - IPsec Transport Mode Encapsulation)
+
 
 * **Tunnel Mode:**
     * **Function:** Encrypts or authenticates the *entire* original IP packet (header + payload). A *new* IP header is then added outside the encrypted original packet.
     * **Use Case:** Most commonly used for network-to-network (e.g., site-to-site VPNs) or host-to-network communication (e.g., remote access VPNs).
     * **Header:** Creates a new outer IP header for routing through the unsecured network, and the original IP packet becomes the payload of the new IP packet.
-(Image Placeholder - IPsec Tunnel Mode Encapsulation):
+
+
+![IPSec](images/IPSec.png)
+
+
 
 #### TUNNELING VS ENCAPSULATION
 Encapsulation is a generic networking concept that involves wrapping one protocol's payload inside another so it can be transmitted across a network. It's used for routing and transporting data, but not by default for security or encryption. Examples include an IPv6 packet over an IPv4 network (6 to 4 Tunneling and Encapsulation), and Generic Routing Encapsulation (GRE) which wraps Layer 3 traffic inside IP packets with no mechanism for authentication.
@@ -1191,8 +1193,6 @@ IPsec doesn't support Broadcast & Multicast traffic, only Unicast. To SUMMARIZE:
     * **Analogy:** Like putting a letter (your original packet) inside an envelope (the carrier protocol's header) to send it through a mail system (the intermediate network).
     * **Common Use:** Essential for VPNs, allowing secure or private communication over a public, unsecured network like the internet.
 
-(Image Placeholder - General Encapsulation)
-(Image Placeholder - General Tunneling)
 
 #### 1. Authentication Header (AH)
 
@@ -3344,8 +3344,6 @@ For traffic to flow between different VLANs, routing must occur at Layer 3:
         ```
     * This configures a virtual interface for each VLAN, allowing the switch to route traffic between them directly.
 
-### Conclusion
-
 Properly configuring VLANs and managing broadcast domains are critical for maintaining network efficiency, security, and scalability. By segmenting a network into VLANs and correctly configuring inter-VLAN routing, network administrators can ensure optimal performance and robust security across the network infrastructure.
 
 ### Multilayer Switching and Inter-VLAN Routing
@@ -3411,8 +3409,6 @@ To change the native VLAN on a router or switch, use the following commands depe
     Switch(config-if)# no switchport  # This command transforms the interface from Layer 2 to Layer 3
     ```
 
-#### Conclusion
-
 Multilayer switches offer extensive flexibility and efficiency in managing inter-VLAN routing and overall network traffic. Proper configuration of native VLANs and understanding how to utilize and configure routed ports and SVIs are crucial for optimizing network performance and security. These capabilities allow network administrators to manage complex network topologies more effectively, integrating voice, data, and video traffic over a unified infrastructure.
 
 ### Switch Virtual Interfaces (SVI) and Multilayer Switch Configuration
@@ -3472,9 +3468,6 @@ Switch(config-if)# no shutdown
 ```
 
 This configuration is ideal for point-to-point links between switches or connections to other routers.
-
-#### Conclusion
-
 Configuring SVIs and routed ports on Layer 3 switches greatly enhances the flexibility and efficiency of network designs. These features facilitate advanced network segmentation, efficient routing, and simplified infrastructure with fewer devices and interconnections. Properly setting up and managing these interfaces ensures robust, scalable network architecture capable of supporting diverse organizational needs.
 
 
@@ -3538,8 +3531,6 @@ Dynamic Trunking Protocol (DTP) is a Cisco proprietary protocol that facilitates
 * **Consistency:** Ensure that both ends of a trunk are configured consistently to prevent errors or undesired operation.
 * **Switch Compatibility:** Newer Cisco switches default to dynamic auto, while older models may default to dynamic desirable. Adjust configurations appropriately based on model capabilities and network requirements.
 
-### Conclusion
-
 Understanding Dynamic Trunking Protocol is crucial for configuring and managing VLANs effectively on Cisco switches. Properly leveraging DTP can lead to simplified management and automated switch configuration, but it requires careful handling to maintain network security and performance. Always ensure your switch configurations are deliberate and secure, especially in sensitive or complex network environments.
 
 ## VLAN Trunking Protocol (VTP)
@@ -3590,8 +3581,6 @@ Sw# show vtp status
 * **Compatibility:** Ensure all switches within the VTP domain can support the intended VTP version, especially when using extended VLANs with VTP v3.
 * **Precaution:** Reset the configuration revision number to zero when changing the domain name or switching a device from server/client to transparent to prevent accidental propagation of an old VLAN database.
 
-### Conclusion
-
 Understanding VTP is essential for network administrators to efficiently manage large-scale networks with multiple VLANs. Proper use of VTP can significantly reduce administrative overhead and potential for configuration errors. However, it requires cautious handling to maintain network stability and security.
 
 ---
@@ -3627,8 +3616,6 @@ Cisco’s Per-VLAN Spanning Tree (PVST) enhances STP by allowing separate spanni
 
 * **PortFast:** Bypasses the traditional listening/learning states and directly places a port into the forwarding state when connected to a single host.
 * **BPDU Guard:** Automatically disables a port if a BPDU message is received on that port, useful in PortFast-enabled ports to prevent accidental loop formations.
-
-### Conclusion
 
 The Spanning Tree Protocol and its enhancements like Cisco's PVST are critical for the design and operation of modern networks with redundancy. Understanding how to implement and manage these protocols helps in achieving a stable, efficient, and loop-free network topology, ensuring high availability and reliability in enterprise environments.
 
@@ -3822,8 +3809,6 @@ When a switch is powered on, each assumes it is the potential Root Bridge, initi
 * `Sw# show spanning-tree detail`: Provides comprehensive details about the root bridge, time parameters, and port states for each VLAN.
 
 These commands and settings are critical for managing how switches interact within a network, handling redundant paths, and ensuring there are no loops while maintaining optimal redundancy and failover capabilities.
-
-### Conclusion
 
 Through the intelligent application of STP principles and careful configuration of bridge priorities and path costs, network administrators can effectively manage redundant paths and ensure robust network performance without loops. This makes STP a critical component in the design and operation of scalable, reliable Ethernet networks.
 
@@ -4691,7 +4676,7 @@ Router(config-router)# variance 2
 
 This setup configures EIGRP for autonomous system 100, enables it on all interfaces with IP addresses in the 10.0.0.0/24 range,
 sets the router ID to 1.1.1.1, disables auto-summarization, allows up to 4 equal or unequal paths for load balancing, and sets the variance multiplier to 2.
-### Conclusion
+
 EIGRP's sophisticated metric calculation and flexibility make it a robust choice for large enterprise networks seeking efficient, reliable routing with quick convergence times. Its ability to balance load across multiple paths, even those of unequal cost, provides enhanced network utilization and redundancy.
 
 A wildcard mask uses opposite bits of a subnet mask. For example, a subnet mask of `255.255.255.0` is `11111111.11111111.11111111.00000000` in binary. The corresponding wildcard mask would be `0.0.0.255`, which is `00000000.00000000.00000000.11111111` in binary.
