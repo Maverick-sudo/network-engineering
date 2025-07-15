@@ -862,48 +862,6 @@ After configuring OSPF, verify that adjacency is established and routes are lear
       * Try to ping the loopback addresses of your Core routers (e.g., `ping 172.16.1.1` from a PC).
       * Expected Output: All these pings should now be successful, as Layer 3 routing is enabled\!
 
-Okay, great idea\! Adding notes for the Port-Channels will definitely help visualize the Layer 2 and Layer 3 bundling.
 
-Here are the notes for the Packet Tracer dashboard, summarizing your Port-Channel configurations:
-
------
-
-**1. DSW-R3 Port-Channels to Access Switches:**
-
-```
-DSW-R3 Port-Channels (Routed L3)
----------------------------------
-Po30: Fa0/1, Fa0/2 (to SW1) - 10.0.2.1/30
-Po31: Fa0/3, Fa0/4 (to SW2) - 10.0.2.5/30
-Po32: Fa0/5, Fa0/6 (to SW3) - 10.0.2.9/30
-Po33: Fa0/7, Fa0/8 (to SW4) - 10.0.2.13/30
-```
-
------
-
-**2. DSW-R4 Port-Channels to Access Switches:**
-
-```
-DSW-R4 Port-Channels (Routed L3)
----------------------------------
-Po40: Fa0/1, Fa0/2 (to SW1) - 10.0.2.17/30
-Po41: Fa0/3, Fa0/4 (to SW2) - 10.0.2.21/30
-Po42: Fa0/5, Fa0/6 (to SW3) - 10.0.2.25/30
-Po43: Fa0/7, Fa0/8 (to SW4) - 10.0.2.29/30
-```
-
------
-
-**3. Access Switch Port-Channels (SW1-SW4):**
-
-```
-Access Switches Port-Channels (Trunk L2)
------------------------------------------
-SW1: Po10 (to R3), Po20 (to R4)
-SW2: Po11 (to R3), Po21 (to R4)
-SW3: Po12 (to R3), Po22 (to R4)
-SW4: Po13 (to R3), Po23 (to R4)
-All Port-Channels on Access Switches are configured as Trunk ports.
-```
 
 -----
