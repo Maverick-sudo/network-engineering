@@ -1,4 +1,3 @@
-# Network Engineering Notes Table of Contents
 1. CHAPTER 1: OSI & TCP/IP IMPLEMENTATION OF NETWORKING PROTOCOLS
 
 2. CHAPTER 2: TCP/IP NETWORK MODEL AND IMPLEMENTATION
@@ -157,7 +156,7 @@ You will hear more often about the TCP/IP model, which is a 4-Abstraction layere
 | **Interoperability**| More rigid due to strict layering             | More adaptable, easier for cross-platform communication |
 | **Security** | Security considerations at all layers (conceptual) | Security often implemented at specific layers (e.g., IPSec at Network) |
 
-### Network Interface layer / LINK LAYER https://en.wikipedia.org/wiki/Link_layer
+### Network Interface layer / LINK LAYER
 This layer emcompasses group of methods and communications protocols confined to the link that a host is physically connected to i.e the physical interface between the host system and the network hardware. It defines how data packets are to be formatted for transmission and routings. The link is the physical and logical network component used to interconnect hosts or nodes in the network and a link protocol is a suite of methods and standards that operate only between adjacent network nodes of a network segment. The link layer includes the protocols that define communication between local (on-link) network nodes which fulfill the purpose of maintaining link states between the local nodes, such as the local network topology, and that usually use protocols that are based on the framing of packets specific to the link types.  
 The goal of this layer is to provide reliable communications between hosts connected on a network. Some of the services provided by this layer of the network stack include.
 Data Framing - Breaking up the data stream into individual frames in packets. Data frames are groups of data bits at the Link layer that need to be routed to the correct physical location.
@@ -166,7 +165,7 @@ Acknowledgment - Sending either a positive (data was received) or negative (data
 Flow Control - Buffering data transmissions to ensure that a fast sender does not overwhelm a slower receiver.
 Includes Various Protocols such as Wired Ethernet IEEE802.3, Wireless LAN IEEE802.11(WIFI), Neighbor Discovery Protocol(NDP), Secure Neighbor Discovery (SEND), Gratuitous ARP(GARP), Point-to-point Protocol(PPP), Media Access Control Protocols I.e Carrier-sense multiple access with collision detection (CSMA/CD) is a media access control (MAC) method used most notably in early Ethernet technology for local area networking. It uses carrier-sensing to defer transmissions until no other stations are transmitting. This is used in combination with collision detection in which a transmitting station detects collisions by sensing transmissions from other stations while it is transmitting a frame. When this collision condition is detected, the station stops transmitting that frame, transmits a jam signal, and then waits for a random time interval before trying to resend the frame. CSMA/CD is a modification of pure carrier-sense multiple access (CSMA). CSMA/CD is used to improve CSMA performance by terminating transmission as soon as a collision is detected, thus shortening the time required before a retry can be attempted.  
 In Internet Protocol (IP) networks, the MAC address of an interface corresponding to an IP address may be queried with the Address Resolution Protocol (ARP) for IPv4 and the Neighbor Discovery Protocol (NDP) for IPv6, It routes data frames to the correct physical/MAC addresses. A switch (could be your computer or router) keeps track of local devices and their MAC addresses and makes sure data frames get to the correct physical location. Also Reverse Address Resolution Protocol(RARP) Operates here.
-This particular layer has several unique security vulnerabilities that can be exploited by a determined adversary. https://en.wikipedia.org/wiki/Network_interface_layer_security
+This particular layer has several unique security vulnerabilities that can be exploited by a determined adversary.
 Wired Networks 
 ✔️ Content Address Memory(CAM)/ MAC Address table exhaustion attack
 ✔️ Address Routing Protocol(ARP) spoofing
@@ -175,7 +174,7 @@ Wireless Networks
 ✔️ Hidden Node Attack
 ✔️ De-auth(De-authentication) Attack
 
-### INTERNET LAYER https://en.wikipedia.org/wiki/Internet_layer
+### INTERNET LAYER 
 Is a Layer of group of Internetworking methods(concepts of connecting multiple networks with each other via gateways), protocols & specifications that are used to transport network packets(IP-based packets) from the ordination host across network boundaries, If necessary to the destination host specified by an Internet protocol address put simply, This is where IP Logical Addressing system and Routing occur. A common design aspect in the internet layer is the robustness principle: "Be liberal in what you accept, and conservative in what you send"
 
 In its operation as a connectionless protocol, the internet layer is not responsible for reliable transmission. It provides only an unreliable service, and best effort delivery. This means that the network makes no guarantees about the proper arrival of packets. This in accordance with the *end-to-end principle*. Since packet delivery across diverse networks is an inherently unreliable and failure-prone operation, the burden of providing reliability was placed with the end points of a communication path, i.e., the hosts, rather than on the network. This is one of the reasons of the resiliency of the Internet against individual link failures and its proven scalability. The aspect of data integrity function of providing reliability of service is the duty of higher level protocols, such as the (TCP) in the transport layer. 
@@ -187,7 +186,7 @@ For incoming packets, capture packets and pass the packet payload up to the appr
 Provide Error Detection & Diagnostic Capability. Usually through Internet Control Message Protocol(ICMP) & Internet Group Management Protocol(IGMP)
 
 
-### TRANSPORT LAYER https://en.wikipedia.org/wiki/Transport_layer
+### TRANSPORT LAYER 
 The transport layer is responsible for delivering data to the appropriate application process on the host computers. The services in this layer are conveyed to an Application Programming Interface through the transport layer protocols, Their services may include the following features.
 ✔️Connection-Oriented Communication
 ✔️Same Order Delivery
@@ -196,11 +195,11 @@ The transport layer is responsible for delivering data to the appropriate applic
 ✔️Traffic Congestion Avoidance 
 ✔️Multiplexing==>Ports providing multiple endpoints on single node.
 *Transport Layer Protocols includes also
-UDP-lite https://en.wikipedia.org/wiki/UDP-Lite
-Reliable UDP(RUDP) https://en.wikipedia.org/wiki/Reliable_User_Datagram_Protocol
-Multipath TCP https://en.wikipedia.org/wiki/Multipath_TCP
-Stream Control Transmission Protocol(SCTP) https://en.wikipedia.org/wiki/Stream_Control_Transmission_Protocol 
-Datagram Congestion Control Protocol(DCCP) https://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol
+UDP-lite
+Reliable UDP(RUDP) 
+Multipath TCP 
+Stream Control Transmission Protocol(SCTP) 
+Datagram Congestion Control Protocol(DCCP) 
 
 At this layer, the TCP/IP protocol suite defines how different applications on separate hosts establish connections and track communications.
 Understanding how protocols use ports to establish connections is critical for configuring and supporting network services. Protocols at the Transport layer are concerned with the delivery of **multiplexed application data**.
@@ -219,7 +218,7 @@ A **Socket** is a software process that identifies a specific endpoint for commu
 A server socket can support multiple connections from a number of client sockets, and a client may open multiple connections to the same server port. Each combination of Source Socket and Destination Socket forms a separate connection, listed in the host's **State Table**. Server replies are directed to the ephemeral (client) port that opened the connection, allowing data to be received by the correct application on the client.
 
 
-### APPLICATION LAYER https://en.wikipedia.org/wiki/Category:Application_layer_protocols
+### APPLICATION LAYER 
 This includes the opening and closing of sessions, translating data, and the interaction with content at the application level. Here, there are multiple protocols for web content, email, and accessing files, including HTTP, FTP, SMTP, and more. 
 
 ---
@@ -1901,7 +1900,7 @@ Advantages over POP
 ## POP (Post Office Protocol) 
 POP is an application-layer Internet standard protocol used by e-mail clients to retrieve e-mail from a mail server. POP version 3 (POP3) is the version in common use. A POP3 server listens on well-known port number 110 for service requests. Encrypted communication for POP3 is either requested after protocol initiation, using the STLS command, if supported, or by POP3S, which connects to the server using Transport Layer Security (TLS) or Secure Sockets Layer (SSL) on well-known TCP port number 995.
 
-## SSH Secure Shell (SSH) https://github.com/openssh/openssh-portable-ssh
+## SSH Secure Shell (SSH)
 
 ### Secure Shell (SSH)
 
@@ -2047,8 +2046,8 @@ As our first attempt we will try to simply list all the available directories to
         * The user's group ID
     * These are used in determining access rights to the specified file. This is what controls user permissions, I.E read and write of files.
     * Open Network Computing Remote Procedure Call (ONC RPC) / Secure RPC is fundamental to the Secure NFS system. The goal of Secure RPC is to build a system that is at minimum as secure as a time-sharing system (one in which all users share a single computer). A time-sharing system authenticates a user through a login password. With data encryption standard (DES) authentication, the same authentication process is completed. Users can log in on any remote computer just as they can on a local terminal, and their login passwords are their passports to network security.
-    * Further Reading [https://docs.oracle.com/cd/E19683-01/816-4882/6mb2ipq7l/index.html](https://docs.oracle.com/cd/E19683-01/816-4882/6mb2ipq7l/index.html)
-    * The first of which is key to interacting with any NFS share from your local machine: `nfs-common`. It is important to have this package installed on any machine that uses NFS, either as client or server. It includes programs such as: `lockd`, `statd`, `showmount`, `nfsstat`, `gssd`, `idmapd` and `mount.nfs`. [https://www.kali.org/tools/nfs-utils/#nfs-common](https://www.kali.org/tools/nfs-utils/#nfs-common)
+
+    * The first of which is key to interacting with any NFS share from your local machine: `nfs-common`. It is important to have this package installed on any machine that uses NFS, either as client or server. It includes programs such as: `lockd`, `statd`, `showmount`, `nfsstat`, `gssd`, `idmapd` and `mount.nfs`.
 
     ### End-to-End Principle Governing TCP/Internet Protocol Suite
 
@@ -2083,7 +2082,7 @@ A firewall is a tool designed to intercept and assess incoming and outgoing pack
     * do not check content, but they can inspect and filter on information like:
     * Source IP, Destination IP, Destination port numbers on a packet as well as the protocols used.
     * They are best suited Within your network to control traffic from internal network to internal network
-    * For example, within an organization, we can use a packet-filtering firewall to prevent the flow of packets between different parts of the network. Project([https://www.codecademy.com/courses/introduction-to-cybersecurity/articles/project-firewall](https://www.codecademy.com/courses/introduction-to-cybersecurity/articles/project-firewall))
+    * For example, within an organization, we can use a packet-filtering firewall to prevent the flow of packets between different parts of the network.
 
 * **✔️Circuit-Level Firewalls**
     * reviews content related to individual sessions.
@@ -5364,6 +5363,7 @@ An option used frequently in production networks—all devices store their log m
 | `[no] service sequence-numbers`           | Global command to enable or disable (with the `no` option) the use of sequence numbers in log messages. |
 
 ```markdown
+
 ## NETWORK TIME PROTOCOL (NTP) (UDP PORT 123)
 
 NTP’s job is to synchronize clocks, but NTP works best if you set the device clock to a reasonably close time before enabling the NTP client function with the NTP server command. Setting the time correctly gives NTP a good start toward synchronizing.
