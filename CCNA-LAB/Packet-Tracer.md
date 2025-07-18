@@ -490,7 +490,7 @@ For DSW-R3's Port-Channels (Po30-33) and DSW-R4's Port-Channels (Po40-43):
 You would perform these steps for all the Port-Channels connecting the DSWs to the ASWs. This ensures they are properly configured as Layer 2 trunks, aligning with the 2960's capabilities. 
 
 
-## Section 6: Configure VLANs (Creation on all relevant switches):
+## Section 6: Configure VLANs:
 
   * Purpose: Before you can assign interfaces to a VLAN or create a Switched Virtual Interface (SVI) for a VLAN, the VLAN itself must exist in the switch's VLAN database.
   * Action: Go to global configuration mode (`conf t`) on ALL of your Distribution Switches (`DSW-R3`, `DSW-R4`) and ALL of your Access Switches (`ASW-1`, `ASW-2`, `ASW-3`, `ASW-4`). Create VLANs 10, 20, and 99 with their respective names:
@@ -1557,3 +1557,741 @@ Goal: To enable the DNS service on `Server1` and create a record that resolves `
     ```
 
       * Expected Result: It should show the DNS server (192.168.99.10) and then the address of `maverickacademy.com` as `192.168.99.10`.
+
+-----
+
+## Section 16: Implement Access Layer Security (DHCP Snooping, Dynamic ARP Inspection, Port Security)
+
+Goal: To configure security features on the access layer switches (`SW1`, `SW2`, `SW3`, `SW4`) to mitigate common Layer 2 threats and ensure the integrity of your network's IP address and ARP information.
+
+Order of Implementation (Important for Dependencies):
+
+1.  DHCP Snooping: This builds the trusted database that DAI relies on.
+2.  Dynamic ARP Inspection (DAI): Relies on the DHCP Snooping binding table.
+3.  Port Security: Independent, but typically configured on end-device access ports.
+
+-----
+
+16.1 Configure DHCP Snooping
+
+DHCP Snooping is a Layer 2 security feature that helps prevent rogue DHCP servers from operating on the network and builds a binding table of legitimate IP-MAC address pairs.
+
+  * Trust Ports: Ports connected to legitimate DHCP servers (your DSWs via their respective Port-Channels) must be configured as trusted. All other ports (access ports for end devices) are untrusted by default.
+  * VLAN Association: DHCP snooping must be enabled per VLAN.
+
+Action: Go to global configuration mode on each Access Switch (`SW1`, `SW2`, `SW3`, `SW4`).
+
+On `SW1`:
+
+```
+SW1(config)# ip dhcp snooping
+SW1(config)# ip dhcp snooping vlan 10,20,99  ! Enable DHCP snooping for all user VLANs
+!
+! IMPORTANT: In Packet Tracer, 'ip dhcp snooping trust' must be applied to the physical
+! interfaces that are part of the EtherChannel, not directly to the Port-Channel interface.
+SW1(config)# interface range FastEthernet0/1 - 4  ! Physical interfaces for Po1 (Fa0/1-2) and Po2 (Fa0/3-4)
+SW1(config-if-range)# ip dhcp snooping trust
+SW1(config-if-range)# exit
+!
+! All other access ports (Fa0/5-24) are untrusted by default.
+! Limit the rate of DHCP messages on untrusted ports to prevent DoS attacks.
+SW1(config)# interface range FastEthernet0/5 - 24 ! Assuming these are your user-facing ports
+SW1(config-if-range)# ip dhcp snooping limit rate 10 ! Limit to 10 DHCP packets per second
+SW1(config-if-range)# exit
+```
+
+On `SW2`:
+
+```
+SW2(config)# ip dhcp snooping
+SW2(config)# ip dhcp snooping vlan 10,20,99
+!
+SW2(config)# interface range FastEthernet0/1 - 4
+SW2(config-if-range)# ip dhcp snooping trust
+SW2(config-if-range)# exit
+!
+SW2(config)# interface range FastEthernet0/5 - 24
+SW2(config-if-range)# ip dhcp snooping limit rate 10
+SW2(config-if-range)# exit
+```
+
+On `SW3`:
+
+```
+SW3(config)# ip dhcp snooping
+SW3(config)# ip dhcp snooping vlan 10,20,99
+!
+SW3(config)# interface range FastEthernet0/1 - 4
+SW3(config-if-range)# ip dhcp snooping trust
+SW3(config-if-range)# exit
+!
+SW3(config)# interface range FastEthernet0/5 - 24
+SW3(config-if-range)# ip dhcp snooping limit rate 10
+SW3(config-if-range)# exit
+```
+
+On `SW4`:
+
+```
+SW4(config)# ip dhcp snooping
+SW4(config)# ip dhcp snooping vlan 10,20,99
+!
+SW4(config)# interface range FastEthernet0/1 - 4
+SW4(config-if-range)# ip dhcp snooping trust
+SW4(config-if-range)# exit
+!
+SW4(config)# interface range FastEthernet0/5 - 24
+SW4(config-if-range)# ip dhcp snooping limit rate 10
+SW4(config-if-range)# exit
+```
+
+-----
+
+16.2 Configure Dynamic ARP Inspection (DAI)
+
+DAI works by intercepting ARP packets on untrusted ports and validating them against the DHCP snooping binding table (or static ARP entries). Invalid ARP packets are dropped.
+
+  * VLAN Association: DAI must be enabled per VLAN.
+  * Trust Ports: Similar to DHCP snooping, ports connected to legitimate sources of ARP (your DSWs via their respective Port-Channels) must be configured as trusted.
+
+Action: Go to global configuration mode on each Access Switch (`SW1`, `SW2`, `SW3`, `SW4`).
+
+On `SW1`:
+
+```
+SW1(config)# ip arp inspection vlan 10,20,99 ! Enable DAI for all user VLANs
+!
+! IMPORTANT: In Packet Tracer, 'ip arp inspection trust' must be applied to the physical
+! interfaces that are part of the EtherChannel, not directly to the Port-Channel interface.
+SW1(config)# interface range FastEthernet0/1 - 4
+SW1(config-if-range)# ip arp inspection trust
+SW1(config-if-range)# exit
+!
+! For untrusted interfaces, specify validation checks.
+! 'src-mac' validates the source MAC address.
+! 'ip' validates the IP-MAC binding against the DHCP snooping table.
+! 'dst-mac' validates the destination MAC address for ARP replies.
+SW1(config)# interface range FastEthernet0/5 - 24
+SW1(config-if-range)# ip arp inspection validate src-mac ip dst-mac ! Recommended validation
+SW1(config-if-range)# exit
+```
+
+On `SW2`:
+
+```
+SW2(config)# ip arp inspection vlan 10,20,99
+!
+SW2(config)# interface range FastEthernet0/1 - 4
+SW2(config-if-range)# ip arp inspection trust
+SW2(config-if-range)# exit
+!
+SW2(config)# interface range FastEthernet0/5 - 24
+SW2(config-if-range)# ip arp inspection validate src-mac ip dst-mac
+SW2(config-if-range)# exit
+```
+
+On `SW3`:
+
+```
+SW3(config)# ip arp inspection vlan 10,20,99
+!
+SW3(config)# interface range FastEthernet0/1 - 4
+SW3(config-if-range)# ip arp inspection trust
+SW3(config-if-range)# exit
+!
+SW3(config)# interface range FastEthernet0/5 - 24
+SW3(config-if-range)# ip arp inspection validate src-mac ip dst-mac
+SW3(config-if-range)# exit
+```
+
+On `SW4`:
+
+```
+SW4(config)# ip arp inspection vlan 10,20,99
+!
+SW4(config)# interface range FastEthernet0/1 - 4
+SW4(config-if-range)# ip arp inspection trust
+SW4(config-if-range)# exit
+!
+SW4(config)# interface range FastEthernet0/5 - 24
+SW4(config-if-range)# ip arp inspection validate src-mac ip dst-mac
+SW4(config-if-range)# exit
+```
+
+-----
+
+16.3 Configure Port Security
+
+Port Security allows you to limit the number of MAC addresses learned on an interface and restrict access to specific MAC addresses. This prevents unauthorized devices from connecting to a port.
+
+  * Mode: Most commonly used with `mac-address sticky` to dynamically learn and then secure addresses.
+  * Violation Mode: Determines the action when a violation occurs.
+      * `shutdown`: The port is immediately put into an `err-disabled` state, requiring manual intervention (`shutdown` then `no shutdown`). This is the most secure.
+      * `restrict`: Frames from unknown source MAC addresses are dropped, but the port remains up and a log message/SNMP trap is generated. This is your preferred mode for this lab, as it avoids manual port recovery.
+      * `protect`: Frames from unknown source MAC addresses are simply dropped silently, with no logging. Least secure.
+  * Maximum MACs: How many MAC addresses are allowed. Typically 1 for an end-user port.
+
+Action: Go to interface configuration mode for your user-facing access ports (`Fa0/5` to `Fa0/24`) on each Access Switch (`SW1`, `SW2`, `SW3`, `SW4`).
+
+On `SW1`:
+
+```
+SW1(config)# interface range FastEthernet0/5 - 24
+SW1(config-if-range)# switchport mode access                     ! Ensure ports are in access mode
+SW1(config-if-range)# switchport port-security                  ! Enable port security
+SW1(config-if-range)# switchport port-security maximum 1        ! Allow only 1 MAC address
+SW1(config-if-range)# switchport port-security mac-address sticky ! Dynamically learn and stick
+SW1(config-if-range)# switchport port-security violation restrict ! Changed to restrict
+SW1(config-if-range)# end
+SW1# write memory
+```
+
+On `SW2`:
+
+```
+SW2(config)# interface range FastEthernet0/5 - 24
+SW2(config-if-range)# switchport mode access
+SW2(config-if-range)# switchport port-security
+SW2(config-if-range)# switchport port-security maximum 1
+SW2(config-if-range)# switchport port-security mac-address sticky
+SW2(config-if-range)# switchport port-security violation restrict
+SW2(config-if-range)# end
+SW2# write memory
+```
+
+On `SW3`:
+
+```
+SW3(config)# interface range FastEthernet0/5 - 24
+SW3(config-if-range)# switchport mode access
+SW3(config-if-range)# switchport port-security
+SW3(config-if-range)# switchport port-security maximum 1
+SW3(config-if-range)# switchport port-security mac-address sticky
+SW3(config-if-range)# switchport port-security violation restrict
+SW3(config-if-range)# end
+SW3# write memory
+```
+
+On `SW4`:
+
+```
+SW4(config)# interface range FastEthernet0/5 - 24
+SW4(config-if-range)# switchport mode access
+SW4(config-if-range)# switchport port-security
+SW4(config-if-range)# switchport port-security maximum 1
+SW4(config-if-range)# switchport port-security mac-address sticky
+SW4(config-if-range)# switchport port-security violation restrict
+SW4(config-if-range)# end
+SW4# write memory
+```
+
+-----
+
+16.4 Verification of Access Layer Security
+
+After configuring, it's crucial to verify that these features are working correctly.
+
+1.  Verify DHCP Snooping:
+
+      * On any Access Switch (`SW1`):
+        ```
+        SW1# show ip dhcp snooping
+        SW1# show ip dhcp snooping binding
+        SW1# show ip dhcp snooping status
+        ```
+          * Expected: You should see that DHCP snooping is enabled, for the correct VLANs. The binding table should populate with IP-MAC address entries for your connected PCs after they obtain an IP via DHCP. The physical uplink interfaces (`Fa0/1-4`) should be listed as trusted.
+
+2.  Verify Dynamic ARP Inspection (DAI):
+
+      * On any Access Switch (`SW1`):
+        ```
+        SW1# show ip arp inspection vlan 10,20,99
+        SW1# show ip arp inspection interfaces
+        ```
+          * Expected: DAI should be enabled for the correct VLANs. The physical uplink interfaces (`Fa0/1-4`) should be listed as trusted.
+
+3.  Verify Port Security:
+
+      * On any Access Switch (`SW1`):
+        ```
+        SW1# show port-security
+        SW1# show port-security interface FastEthernet0/5
+        ```
+          * Expected: Port security should be enabled, with a max of 1 MAC address, sticky learning, and `restrict` violation mode. The `show port-security interface` command should show that 1 MAC address has been learned.
+
+4.  Test Security Features (Optional but Recommended):
+
+      * Test DHCP Snooping/DAI (Rogue DHCP): Try connecting a new "server" device to an untrusted access port and configuring it as a DHCP server. It should be blocked, and legitimate clients should not receive addresses from it.
+      * Test Port Security (`restrict` mode):
+          * While a PC is connected to an access port (e.g., `Fa0/5` on `SW1`), try connecting a *second* PC to the *same* `Fa0/5` port.
+          * The first PC should maintain connectivity. The second PC should *not* get an IP or be able to communicate.
+          * Check `show port-security interface Fa0/5` - you should see "Last Source Address Violate" and "Security Violation Count" increment. The port should remain `up/up`.
+
+-----
+
+
+## Section 17: Configure Network Time Protocol (NTP)
+
+Goal: To configure `Server1` as an NTP server and synchronize all your network devices (`DSW-R3`, `DSW-R4`, `SW1`, `SW2`, `SW3`, `SW4`) to it, incorporating NTP source interface configuration and NTP authentication commands.
+
+17.1 Configure NTP Service on Server1
+
+  * Action: Go to `Server1` in Packet Tracer and enable its NTP service.
+
+    1.  Click on `Server1`.
+    2.  Go to the `Services` tab.
+    3.  In the left-hand pane, click on `NTP`.
+    4.  Ensure the `NTP Service` is toggled `On`. (No further configuration is typically needed on the Packet Tracer server side for basic NTP, and authentication isn't supported here).
+
+Let's enhance our NTP configuration to include a couple of best practices:
+
+1.  NTP Source Interface: This specifies which interface's IP address the device should use as the source for outgoing NTP requests. Using a Loopback interface for this (especially on routers like your DSWs) is a common best practice because loopback interfaces are always up and their IP addresses are stable, providing a consistent source regardless of physical interface state changes.
+2.  NTP Authentication: This adds a layer of security to NTP synchronization by ensuring that devices only accept time updates from trusted NTP sources, preventing malicious time manipulation. It uses cryptographic keys to verify the authenticity of NTP packets.
+
+Important Note for Packet Tracer: While we will configure NTP authentication commands on your Cisco devices, Packet Tracer's generic `Server1` NTP service does not support NTP authentication keys. This means your Cisco devices will attempt to authenticate, but `Server1` won't enforce it, and synchronization will still occur. In a real environment with a Cisco device or dedicated NTP server supporting authentication, the keys would need to match on both sides. We're doing this to demonstrate the commands and their purpose.
+
+
+17.2 Configure Network Devices for NTP with Source Interface and Authentication
+
+  * Action: Go to global configuration mode on each network device. We will define an NTP authentication key, enable NTP authentication, specify the key as trusted, and set the source interface (Loopback0 for DSWs).
+
+      * NTP Authentication Key Details:
+          * Key ID: `1`
+          * Key Type: `md5`
+          * Key Value: `NTP_AUTH_KEY` (You can choose your own secret key, but keep it consistent across devices).
+
+    On `DSW-R3`:
+
+    ```
+    DSW-R3(config)# ntp authentication-key 1 md5 NTP_AUTH_KEY
+    DSW-R3(config)# ntp authenticate
+    DSW-R3(config)# ntp trusted-key 1
+    DSW-R3(config)# ntp server 192.168.99.10 key 1 source Loopback0 ! Use key ID 1 and Loopback0 as source
+    DSW-R3(config)# end
+    DSW-R3# write memory
+    ```
+
+    On `DSW-R4`:
+
+    ```
+    DSW-R4(config)# ntp authentication-key 1 md5 NTP_AUTH_KEY
+    DSW-R4(config)# ntp authenticate
+    DSW-R4(config)# ntp trusted-key 1
+    DSW-R4(config)# ntp server 192.168.99.10 key 1 source Loopback0
+    DSW-R4(config)# end
+    DSW-R4# write memory
+    ```
+
+    On `SW1`:
+    *(Note: Access switches in Packet Tracer typically don't have Loopback interfaces. The `ntp source` command is generally more relevant for routers with multiple interfaces. The switch will automatically source from one of its active SVIs capable of reaching the NTP server.)*
+
+    ```
+    SW1(config)# ntp authentication-key 1 md5 NTP_AUTH_KEY
+    SW1(config)# ntp authenticate
+    SW1(config)# ntp trusted-key 1
+    SW1(config)# ntp server 192.168.99.10 key 1
+    SW1(config)# end
+    SW1# write memory
+    ```
+
+    On `SW2`:
+
+    ```
+    SW2(config)# ntp authentication-key 1 md5 NTP_AUTH_KEY
+    SW2(config)# ntp authenticate
+    SW2(config)# ntp trusted-key 1
+    SW2(config)# ntp server 192.168.99.10 key 1
+    SW2(config)# end
+    SW2# write memory
+    ```
+
+    On `SW3`:
+
+    ```
+    SW3(config)# ntp authentication-key 1 md5 NTP_AUTH_KEY
+    SW3(config)# ntp authenticate
+    SW3(config)# ntp trusted-key 1
+    SW3(config)# ntp server 192.168.99.10 key 1
+    SW3(config)# end
+    SW3# write memory
+    ```
+
+    On `SW4`:
+
+    ```
+    SW4(config)# ntp authentication-key 1 md5 NTP_AUTH_KEY
+    SW4(config)# ntp authenticate
+    SW4(config)# ntp trusted-key 1
+    SW4(config)# ntp server 192.168.99.10 key 1
+    SW4(config)# end
+    SW4# write memory
+    ```
+
+17.3 Verify NTP Synchronization
+
+  * Action: Check the NTP status on your network devices. It might take a few seconds or a minute for synchronization to occur.
+
+    On any network device (e.g., `DSW-R3`):
+
+    ```
+    DSW-R3# show ntp status
+    DSW-R3# show ntp associations
+    DSW-R3# show ntp associations detail
+    ```
+
+      * Expected `show ntp status` output: Look for "Clock is synchronized" and a stratum value (usually 2 or 3 if syncing from a server).
+      * Expected `show ntp associations` / `detail` output: You should see `192.168.99.10` listed. The asterisk `*` next to the IP address indicates that it's the synchronized peer. For `detail`, you'll see information about authentication and source interface. Due to Packet Tracer's limitation with Server1's NTP authentication, you might see "unauthenticated" in the detail, but synchronization will still occur.
+
+-----
+
+## Section 18: Configure Syslog
+
+Goal: To establish a comprehensive logging strategy across your network devices, including centralized logging to `Server1`, local buffering, console/VTY line display, consistent message formatting, and sequence numbering.
+
+18.1 Configure Syslog Service on Server1
+
+  * Action: Go to `Server1` in Packet Tracer and ensure its Syslog service is enabled.
+
+    1.  Click on `Server1`.
+    2.  Go to the `Services` tab.
+    3.  In the left-hand pane, click on `Syslog`.
+    4.  Ensure the `Syslog Service` is toggled `On`.
+
+-----
+
+18.2 Configure Enhanced Syslog on Network Devices
+
+  * Action: Go to global configuration mode on each network device and apply the following enhanced Syslog configurations.
+
+      * `service timestamps log datetime msec`: Adds precise timestamps (with milliseconds, based on NTP) to all log messages. Crucial for accurate event correlation.
+      * `service sequence-numbers`: Adds sequence numbers to log messages, making it easier to track the order of events, especially if logs are lost or delayed.
+      * `logging synchronous` (on line config): Prevents log messages from interrupting your command-line input on console and VTY sessions.
+      * `logging console informational`: Displays log messages of "informational" severity (level 6) and higher to console users.
+      * `logging monitor informational`: Displays log messages of "informational" severity (level 6) and higher to users connected via Telnet/SSH (VTY lines). *Users must also issue `terminal monitor` in their EXEC session to see these.*
+      * `logging buffered 8192 informational`: Stores log messages in the device's RAM buffer (8192 bytes here) up to "informational" severity. These can be viewed later using `show logging`.
+      * `logging host 192.168.99.10`: Sends log messages to `Server1`.
+      * `logging trap informational`: Sets the minimum severity level for messages sent to the external Syslog server.
+      * `logging source-interface`: Specifies the source IP address for syslog messages sent to the external server (Loopback0 for DSWs, Vlan99 for ASWs for consistency and stability).
+
+    -----
+
+    On `DSW-R3`:
+
+    ```
+    DSW-R3(config)# service timestamps log datetime msec
+    DSW-R3(config)# logging host 192.168.99.10
+    DSW-R3(config)# line console 0
+    DSW-R3(config-line)# logging synchronous
+    DSW-R3(config-line)# exit
+    DSW-R3(config)# line vty 0 15
+    DSW-R3(config-line)# logging synchronous
+    DSW-R3(config-line)# exit
+    DSW-R3(config)# end
+    DSW-R3# write memory
+    ```
+
+    On `DSW-R4`:
+
+    ```
+    DSW-R4(config)# service timestamps log datetime msec
+    DSW-R4(config)# logging host 192.168.99.10
+    DSW-R4(config)# line console 0
+    DSW-R4(config-line)# logging synchronous
+    DSW-R4(config-line)# exit
+    DSW-R4(config)# line vty 0 15
+    DSW-R4(config-line)# logging synchronous
+    DSW-R4(config-line)# exit
+    DSW-R4(config)# end
+    DSW-R4# write memory
+    ```
+
+    On `SW1` (and repeat for `SW2`, `SW3`, `SW4`):
+
+    ```
+    SW1(config)# service timestamps log datetime msec
+    SW1(config)# logging host 192.168.99.10
+    SW1(config)# line console 0
+    SW1(config-line)# logging synchronous
+    SW1(config-line)# exit
+    SW1(config)# line vty 0 15
+    SW1(config-line)# logging synchronous
+    SW1(config-line)# exit
+    SW1(config)# end
+    SW1# write memory
+    ```
+
+    *(Remember to apply the same `service` and `logging` commands, and `line console/vty` configs to `SW2`, `SW3`, and `SW4`.)*
+
+-----
+
+18.3 Verify Enhanced Syslog Functionality
+
+  * Action: Generate some log messages on your network devices and check various logging destinations.
+
+    1.  Generate Log Messages: On any network device (e.g., `DSW-R3`), perform an action that generates a log message. A simple way is to enter and exit an interface configuration mode, or intentionally cause an error.
+        ```
+        DSW-R3(config)# interface FastEthernet0/0
+        DSW-R3(config-if)# shutdown
+        DSW-R3(config-if)# no shutdown
+        DSW-R3(config-if)# exit
+        ```
+    2.  Check Local Buffer:
+          * On the device itself (e.g., `DSW-R3` in EXEC mode):
+            ```
+            DSW-R3# show logging
+            ```
+              * Expected: You should see messages with timestamps (including milliseconds) and sequence numbers.
+    3.  Check Console/VTY Display:
+          * If connected via console, you should see messages appear without interrupting your typing.
+          * If connected via Telnet/SSH, remember to type `terminal monitor` in the EXEC mode of your VTY session, then generate a log message. You should then see it appear.
+    4.  Check Server1 Syslog:
+          * Go to `Server1`, navigate to the `Services` tab, and click on `Syslog`.
+          * Expected Result: You should see a list of log messages from your network devices, complete with accurate timestamps, the originating device's IP, and the detailed message.
+
+-----
+Excellent\! That's another major section complete. You now have robust logging in place, with accurate timestamps, sequence numbers, and centralized collection.
+
+Having configured NTP and Syslog, the final core network management service we need to implement is SNMP (Simple Network Management Protocol). This will allow you to monitor your network devices from `Server1` or any other designated management station.
+
+-----
+
+## Section 19: Configure Simple Network Management Protocol (SNMP)
+
+Goal: To enable SNMP on your network devices (`DSW-R3`, `DSW-R4`, `SW1`, `SW2`, `SW3`, `SW4`) and configure `Server1` as an SNMP manager, allowing for network monitoring.
+
+19.1 Configure SNMP Service on Server1
+
+  * Action: Go to `Server1` in Packet Tracer and enable its SNMP service.
+
+    1.  Click on `Server1`.
+    2.  Go to the `Services` tab.
+    3.  In the left-hand pane, click on `SNMP`.
+    4.  Ensure the `SNMP Service` is toggled `On`.
+    5.  You'll see options for `Community String` and `Trap Receiver`. For now, just ensure it's `On`. We'll use the default community string (public/private) for basic testing, but in a real scenario, you'd define secure ones here.
+`Server1` typically doesn't have an "SNMP Service" to *enable* in the `Services` tab for it to act as an SNMP Manager (a device that *receives* traps and *queries* other devices).
+
+Instead, the functionality to act as an SNMP Manager (including a basic Trap Receiver and MIB Browser) is usually found as a desktop application on the server.
+
+
+Goal: To enable SNMP on your network devices (`DSW-R3`, `DSW-R4`, `SW1`, `SW2`, `SW3`, `SW4`) and prepare `Server1` to act as a basic SNMP manager, allowing for network monitoring.
+
+19.1 Prepare Server1 as an SNMP Manager
+
+  * Action: On `Server1`, you don't need to enable a specific "SNMP Service." Instead, you will access the `MIB Browser` application from its Desktop, which in Packet Tracer often doubles as a simple trap receiver.
+
+    1.  Click on `Server1`.
+    2.  Go to the `Desktop` tab.
+    3.  Click on the `MIB Browser` application.
+          * This application allows you to perform basic SNMP Get/GetNext requests and usually has a simple window that displays received traps.
+
+19.2 Configure SNMP on Network Devices
+
+  * Action: Go to global configuration mode on each network device. We will configure SNMP community strings, enable SNMP traps (alerts), specify the trap destination (`Server1`), and set a source interface for SNMP messages.
+
+      * Community Strings: These are like passwords for SNMP.
+          * `public` (read-only): Allows monitoring data from the device.
+          * `private` (read-write): Allows both monitoring and changing configurations (use with extreme caution\!). For this lab, we'll configure both, but `public` is usually sufficient for just monitoring.
+      * SNMP Traps: Event notifications sent from the device to the SNMP manager.
+      * `snmp-server source-interface`: Specifies the source IP address for SNMP messages (traps and responses). Using Loopback0 for DSWs and Vlan99 for ASWs provides stability.
+
+    -----
+
+    On `DSW-R3`:
+
+    ```
+    DSW-R3(config)# snmp-server community public RO  ! Read-Only community string
+    DSW-R3(config)# snmp-server community private RW  ! Read-Write community string (use with caution!)
+    DSW-R3(config)# snmp-server enable traps          ! Enable all standard SNMP traps
+    DSW-R3(config)# snmp-server host 192.168.99.10 traps version 2c public ! Send traps to Server1 using community 'public'
+    DSW-R3(config)# snmp-server source-interface Loopback0 ! Use Loopback0 as source for SNMP messages
+    DSW-R3(config)# end
+    DSW-R3# write memory
+    ```
+
+    On `DSW-R4`:
+
+    ```
+    DSW-R4(config)# snmp-server community public RO
+    DSW-R4(config)# snmp-server community private RW
+    DSW-R4(config)# snmp-server enable traps
+    DSW-R4(config)# snmp-server host 192.168.99.10 traps version 2c public
+    DSW-R4(config)# snmp-server source-interface Loopback0
+    DSW-R4(config)# end
+    DSW-R4# write memory
+    ```
+
+    On `SW1` (and repeat for `SW2`, `SW3`, `SW4`):
+
+    ```
+    SW1(config)# snmp-server community public RO
+    SW1(config)# snmp-server community private RW
+    SW1(config)# snmp-server enable traps
+    SW1(config)# snmp-server host 192.168.99.10 traps version 2c public
+    SW1(config)# snmp-server source-interface Vlan99 ! Using Management VLAN SVI as source
+    SW1(config)# end
+    SW1# write memory
+    ```
+
+    *(Remember to apply the same SNMP configurations to `SW2`, `SW3`, and `SW4`.)*
+
+-----
+
+19.3 Verify SNMP Functionality
+
+  * Action: Trigger some events on your network devices and check if `Server1` receives SNMP traps. You can also try to "ping" the devices from `Server1`'s SNMP MIB Browser (though Packet Tracer's MIB Browser is limited).
+
+    1.  Generate an event on a device (e.g., shutdown/no shutdown an interface):
+
+        ```
+        DSW-R3(config)# interface FastEthernet0/0
+        DSW-R3(config-if)# shutdown
+        DSW-R3(config-if)# no shutdown
+        DSW-R3(config-if)# exit
+        ```
+
+    2.  Check `Server1`'s SNMP Service:
+
+          * Go to `Server1`, navigate to the `Services` tab, and click on `SNMP`.
+          * Expected Result: In the "Trap Receiver" section, you should start seeing incoming SNMP traps/messages from your configured network devices as events occur. The IP address will be the source IP you configured (Loopback0 or Vlan99 SVI).
+
+    3.  Optional: Use Packet Tracer's MIB Browser (limited functionality):
+
+          * On `Server1`, go to `Desktop` tab, then click on `MIB Browser`.
+          * Enter the IP address of one of your network devices (e.g., `192.168.99.253` for DSW-R3's Loopback0, or its SVI IP `192.168.99.254`).
+          * Enter the `Community String` (`public`).
+          * Click `Get` or `GetNext`. While Packet Tracer's MIB browser is very basic and often doesn't populate much data, it might indicate basic connectivity. Observing traps on the SNMP service window is usually more reliable for verification in PT.
+
+SNMP functionality in Packet Tracer is quite basic and limited compared to what you'd experience with real Cisco devices or professional network management software.
+
+Packet Tracer is designed primarily to teach fundamental networking concepts and basic command-line configurations. While it simulates the commands and the basic idea of agents sending traps, it doesn't have a robust MIB browser that can query a wide range of OIDs or display detailed performance data like a real-world NMS (Network Management System) would.
+
+However, despite these limitations, you've successfully:
+
+  * Learned the core SNMP configuration commands (community strings, traps, host, source interface).
+  * Understood the concept of an SNMP agent sending alerts to a manager.
+  * Confirmed basic connectivity for management protocols.
+
+So, while the Packet Tracer simulation itself is basic, your understanding of how to configure SNMP agents on Cisco devices is solid. Now that we've covered the primary network management services (NTP, Syslog, SNMP), let's look at adding another critical layer of security: Securing Device Management Access.
+
+-----
+
+## Section 20: Implement Authentication, Authorization, and Accounting (AAA) - Local Authentication
+
+Goal: To configure local AAA on your network devices to control administrative access, starting with authentication using local usernames and passwords.
+
+20.1 Configure Local AAA and User Accounts
+
+  * Action: Go to global configuration mode on each network device (`DSW-R3`, `DSW-R4`, `SW1`, `SW2`, `SW3`, `SW4`).
+
+    1.  Enable AAA new-model: This is the foundational command to enable AAA services.
+    2.  Create local user accounts: Define usernames and passwords that will be stored on the device itself.
+    3.  Configure AAA authentication for login: Tell the device to use the local database for authenticating users trying to log in via console, Telnet, or SSH.
+    4.  Configure AAA authorization for exec access: Tell the device to use the local database to authorize what commands a user can execute once logged in (though for basic local AAA, it often just grants access to a specific privilege level).
+
+    -----
+
+    On `DSW-R3`:
+
+    ```
+    DSW-R3(config)# aaa new-model
+    !
+    ! Create a privileged user (level 15) for full access
+    DSW-R3(config)# username admin privilege 15 secret cisco
+    !
+    ! Create a read-only user (level 1)
+    DSW-R3(config)# username monitor privilege 1 secret ReadOnlyPass
+    !
+    ! Configure authentication method list for login (console, vty)
+    ! 'default' applies to all lines unless specified otherwise
+    ! 'local' means use the local username database
+    DSW-R3(config)# aaa authentication login default local
+    !
+    ! Configure authorization method list for EXEC (Privileged EXEC mode access)
+    DSW-R3(config)# aaa authorization exec default local
+    !
+    ! Apply AAA to VTY lines (for Telnet/SSH)
+    DSW-R3(config)# line vty 0 15
+    DSW-R3(config-line)# login authentication default
+    DSW-R3(config-line)# authorization exec default
+    DSW-R3(config-line)# transport input all ! Allows Telnet and SSH
+    DSW-R3(config-line)# exit
+    !
+    ! Apply AAA to Console line
+    DSW-R3(config)# line console 0
+    DSW-R3(config-line)# login authentication default
+    DSW-R3(config-line)# authorization exec default
+    DSW-R3(config-line)# exit
+    DSW-R3(config)# end
+    DSW-R3# write memory
+    ```
+
+    On `DSW-R4`:
+
+    ```
+    DSW-R4(config)# aaa new-model
+    !
+    DSW-R4(config)# username admin privilege 15 secret cisco
+    DSW-R4(config)# username monitor privilege 1 secret ReadOnlyPass
+    !
+    DSW-R4(config)# aaa authentication login default local
+    DSW-R4(config)# aaa authorization exec default local
+    !
+    DSW-R4(config)# line vty 0 15
+    DSW-R4(config-line)# login authentication default
+    DSW-R4(config-line)# authorization exec default
+    DSW-R4(config-line)# transport input all
+    DSW-R4(config-line)# exit
+    !
+    DSW-R4(config)# line console 0
+    DSW-R4(config-line)# login authentication default
+    DSW-R4(config-line)# authorization exec default
+    DSW-R4(config-line)# exit
+    DSW-R4(config)# end
+    DSW-R4# write memory
+    ```
+
+    On `SW1` (and repeat for `SW2`, `SW3`, `SW4`):
+
+    ```
+    SW1(config)# aaa new-model
+    !
+    SW1(config)# username admin privilege 15 secret cisco
+    SW1(config)# username monitor privilege 1 secret ReadOnlyPass
+    !
+    SW1(config)# aaa authentication login default local
+    SW1(config)# aaa authorization exec default local
+    !
+    SW1(config)# line vty 0 15
+    SW1(config-line)# login authentication default
+    SW1(config-line)# authorization exec default
+    SW1(config-line)# transport input all
+    SW1(config-line)# exit
+    !
+    SW1(config)# line console 0
+    SW1(config-line)# login authentication default
+    SW1(config-line)# authorization exec default
+    SW1(config-line)# exit
+    SW1(config)# end
+    SW1# write memory
+    ```
+
+    *(Remember to apply the same AAA configurations to `SW2`, `SW3`, and `SW4`.)*
+
+-----
+
+20.2 Verify Local AAA Functionality
+
+  * Action: Test logging into a device using both the `admin` and `monitor` accounts from a PC.
+
+    1.  From a PC (e.g., PC1 in VLAN 10):
+          * Open the `Command Prompt`.
+          * Try to Telnet to a switch's SVI (e.g., `telnet 192.168.10.254` for SW1).
+          * Expected: You should now be prompted for a `Username:` and `Password:`.
+              * Log in with `admin` / `cisco`. You should get full access to Privileged EXEC mode (`#`).
+              * Log in with `monitor` / `ReadOnlyPass`. You should get User EXEC mode (`>`). Try to enter `configure terminal` – it should be denied.
+
+This setup significantly enhances your device access security by requiring explicit user authentication and basic authorization. A very solid stopping point for any networking engineer. You've truly built a robust and well-configured wired network.
+
+Moving forward, i'll be adding wireless LAN, integrating it with the existing VLANs and DHCP services. It you already got to this stage, very impressive, hope you enjoyed the hardwork and looking forward to more.
+
+
